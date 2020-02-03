@@ -38,7 +38,7 @@ while True:
 
     for detection in output[0, 0, :, :]:
         confidence = detection[2]
-        if confidence > .2:
+        if confidence > .28:
             class_id = detection[1]
             class_name = id_class_name(class_id, classNames)
             if class_name == "person":
@@ -50,7 +50,7 @@ while True:
                 human_x = int((box_x + box_width) / 2)
                 human_y = int((box_y + box_height) / 2)
 
-                cv2.circle(image,
+                '''cv2.circle(image,
                            (human_x, human_y),
                            8,
                            (0, 250, 0),
@@ -61,7 +61,7 @@ while True:
                             cv2.FONT_HERSHEY_COMPLEX,
                             (.001 * image_width),
                             (0, 255, 255),
-                            thickness=2)
+                            thickness=2)'''
                 print("Human number ", people_count, " is in (", human_x, ", ", human_y, ")")
     time_end = time.time()
     print("Time of work in seconds: ", time_end - time_start)
