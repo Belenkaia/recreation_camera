@@ -1,20 +1,14 @@
 import cv2
 import filework_functions as ff
 import time
-from time import sleep
-from picamera import PiCamera
 import network_cam as nf
+from camera_functions import Camera
+from constants import const
 
-camera = PiCamera()
 while True:
-    camera.start_preview()
-    sleep(2)
-    camera.capture('../frames/image.jpg')
-    camera.stop_preview()
-
+    Camera().capture_with_delay(const.current_frame_path, 2)
 
     classNames = {0: 'background', 1: 'person'}
-
 
     def id_class_name(class_id, classes):
         for key, value in classes.items():
@@ -24,10 +18,9 @@ while True:
     #
     time_start = time.time()
     # Loading model
-    model = cv2.dnn.readNetFromTensorflow('models/frozen_inference_graph_mobile.pb',
-                                          'models/ssd_mobilenet_v2_coco_2018_03_29.pbtxt')
+    model = cv2.dnn.readNetFromTensorflow(const.inference_graph_path, const.coco_config_path)
 
-    image = cv2.imread(ff.find_last_shot_addr())
+    image = cv2.imread(const.current_frame_path)
 
     image_height, image_width, _ = image.shape
 
