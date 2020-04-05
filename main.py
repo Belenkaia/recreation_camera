@@ -3,12 +3,13 @@ from network_cam import post_data
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.web
 import time
+import threading
 from constants import const
 
 
 class ImageHandler(tornado.web.RequestHandler):
     def get(self):
-        with open(const.current_frame_path, 'rb') as f:
+        with open(const.detected_frame_path, 'rb') as f:
             data = f.read()
             self.write(data)
         self.finish()
@@ -25,15 +26,16 @@ def make_app():
     ])
 
 
-async def loop_job():
-    await capture_and_recognize()
-    # await post_data(people_count, const.device_type, const.zone_id)
-    time.sleep(2)
-    await loop_job()
+def loop_job():
+    people_count = capture_and_recognize()
+    post_data(people_count, const.device_type, const.zone_id)
+    time.sleep(1)
+    loop_job()
 
 
 if __name__ == "__main__":
     app = make_app()
     app.listen(8888)
-    IOLoop.current().spawn_callback(loop_job)
+    x = threading.Thread(target=loop_job)
+    x.start()
     IOLoop.current().start()

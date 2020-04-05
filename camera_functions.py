@@ -20,8 +20,6 @@ class Camera:
         self.camera.stop_preview()
 
     def capture_and_save_windows(self, save_path, delay_s):
-        if os.path.isfile(save_path):
-            os.remove(save_path)
         retval, frame = self.camera.read()
         cv2.imwrite(save_path, frame)
 

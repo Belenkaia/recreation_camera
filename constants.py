@@ -6,6 +6,8 @@ class constants:
     frames_folder = 'frams'
     current_frame_name = 'image.jpg'
     current_frame_path = os.path.join(frames_folder, current_frame_name)
+    detected_frame_name = 'image_box_text.jpg'
+    detected_frame_path = os.path.join(frames_folder, detected_frame_name)
 
     models_folder = 'models'
     inference_graph_path = os.path.join(models_folder, 'frozen_inference_graph.pb')

@@ -4,7 +4,7 @@ from constants import const
 import cv2
 
 
-async def capture_and_recognize():
+def capture_and_recognize():
     Camera().capture_and_save(const.current_frame_path, 2)
 
     classNames = {0: 'background', 1: 'person'}
@@ -58,5 +58,5 @@ async def capture_and_recognize():
     time_end = time.time()
     print("Time of work in seconds: ", time_end - time_start)
     print("People count: ", people_count)
-
+    cv2.imwrite(const.detected_frame_path, image)
     return people_count
