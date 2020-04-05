@@ -9,6 +9,7 @@ def post_data(people_count, device_type, zone_id):
     headers = {'content-type': 'application/json'}
     try:
         requests.post(url=const.recreation_server_endpoint, headers=headers, data=data)
-    except ConnectionError as e:
+    except requests.ConnectionError as e:
+        print('CONNECTION ERROR:\n')
         print(e)
         pass
