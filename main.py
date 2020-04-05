@@ -1,70 +1,39 @@
-import cv2
-import filework_functions as ff
+from detection_functions import capture_and_recognize
+from network_cam import post_data
+from tornado.ioloop import IOLoop, PeriodicCallback
+import tornado.web
 import time
-import network_cam as nf
-from camera_functions import Camera
 from constants import const
 
-while True:
-    Camera().capture_with_delay(const.current_frame_path, 2)
 
-    classNames = {0: 'background', 1: 'person'}
+class ImageHandler(tornado.web.RequestHandler):
+    def get(self):
+        with open(const.current_frame_path, 'rb') as f:
+            data = f.read()
+            self.write(data)
+        self.finish()
 
-    def id_class_name(class_id, classes):
-        for key, value in classes.items():
-            if class_id == key:
-                return value
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write(r'<img src="/frame">')
 
-    #
-    time_start = time.time()
-    # Loading model
-    model = cv2.dnn.readNetFromTensorflow(const.inference_graph_path, const.coco_config_path)
 
-    image = cv2.imread(const.current_frame_path)
+def make_app():
+    return tornado.web.Application([
+        (r'/', MainHandler),
+        (r'/frame', ImageHandler)
+    ])
 
-    image_height, image_width, _ = image.shape
 
-    model.setInput(cv2.dnn.blobFromImage(image, size=(300, 300), swapRB=True))
-    output = model.forward()
+async def loop_job():
+    await capture_and_recognize()
+    # await post_data(people_count, const.device_type, const.zone_id)
+    time.sleep(2)
+    await loop_job()
 
-    people_count = 0
 
-    for detection in output[0, 0, :, :]:
-        confidence = detection[2]
-        if confidence > .2:
-            class_id = detection[1]
-            class_name = id_class_name(class_id, classNames)
-            if class_name == "person":
-                people_count += 1
-                box_x = int(detection[3] * image_width)
-                box_y = int(detection[4] * image_height)
-                box_width = int(detection[5] * image_width)
-                box_height = int(detection[6] * image_height)
-                human_x = int((box_x + box_width) / 2)
-                human_y = int((box_y + box_height) / 2)
-
-                cv2.circle(image,
-                           (human_x, human_y),
-                           8,
-                           (0, 250, 0),
-                           thickness=5)
-                cv2.putText(image,
-                            str(people_count),
-                            (human_x, human_y),
-                            cv2.FONT_HERSHEY_COMPLEX,
-                            (.001 * image_width),
-                            (0, 255, 255),
-                            thickness=2)
-                print("Human number ", people_count, " is in (", human_x, ", ", human_y, ")")
-    time_end = time.time()
-    print("Time of work in seconds: ", time_end - time_start)
-    print("People count: ", people_count)
-
-    nf.post_data(people_count, 0, 3204)
-
-    """cv2.imshow('Processed image', image)
-    cv2.imwrite("image_box_text.jpg", image)
-    
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    """
+if __name__ == "__main__":
+    app = make_app()
+    app.listen(8888)
+    IOLoop.current().spawn_callback(loop_job)
+    IOLoop.current().start()
