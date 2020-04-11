@@ -3,7 +3,7 @@ import os
 
 class constants:
     # work_dir = os.getcwd()
-    frames_folder = 'frams'
+    frames_folder = 'frames'
     current_frame_name = 'image.jpg'
     current_frame_path = os.path.join(frames_folder, current_frame_name)
     detected_frame_name = 'image_box_text.jpg'

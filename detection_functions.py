@@ -16,13 +16,12 @@ def capture_and_recognize():
 
     #
     time_start = time.time()
-    # Loading model
-    model = cv2.dnn.readNetFromTensorflow(const.inference_graph_path, const.coco_config_path)
 
     image = cv2.imread(const.current_frame_path)
-
     image_height, image_width, _ = image.shape
 
+    # Loading model
+    model = cv2.dnn.readNetFromTensorflow(const.inference_graph_path, const.coco_config_path)
     model.setInput(cv2.dnn.blobFromImage(image, size=(300, 300), swapRB=True))
     output = model.forward()
 

@@ -1,9 +1,9 @@
 from detection_functions import capture_and_recognize
 from network_cam import post_data
-from tornado.ioloop import IOLoop, PeriodicCallback
+from tornado.ioloop import IOLoop
 import tornado.web
+import tornado.template
 import time
-import threading
 from constants import const
 
 
@@ -14,9 +14,10 @@ class ImageHandler(tornado.web.RequestHandler):
             self.write(data)
         self.finish()
 
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(r'<img src="/frame">')
+        self.render("templates/frame_template.html")
 
 
 def make_app():
@@ -28,14 +29,13 @@ def make_app():
 
 def loop_job():
     people_count = capture_and_recognize()
-    post_data(people_count, const.device_type, const.zone_id)
+    # post_data(people_count, const.device_type, const.zone_id)
     time.sleep(1)
     loop_job()
 
 
 if __name__ == "__main__":
     app = make_app()
-    app.listen(8888)
-    x = threading.Thread(target=loop_job)
-    x.start()
+    app.listen(5050)
+    IOLoop.current().run_in_executor(None, loop_job)
     IOLoop.current().start()
