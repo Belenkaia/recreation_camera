@@ -5,7 +5,6 @@ images_dir_path = os.path.abspath(os.getcwd()) + '/../frames/'
 scp_command = 'sshpass -p "password" scp pi@192.168.1.102:proba/* ' + images_dir_path
 
 def download_images_script():
-
     os.system(scp_command)
 
 

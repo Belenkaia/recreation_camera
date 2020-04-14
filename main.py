@@ -1,8 +1,8 @@
-from detection_functions import capture_and_recognize
+from detection_functions import recognize_frame
+from camera_functions import Camera
 from network_cam import post_data
 from tornado.ioloop import IOLoop
 import tornado.web
-import tornado.template
 import time
 from constants import const
 
@@ -27,15 +27,17 @@ def make_app():
     ])
 
 
-def loop_job():
-    people_count = capture_and_recognize()
-    # post_data(people_count, const.device_type, const.zone_id)
+def detection_job(cameraManager):
+    cameraManager.capture_and_save(const.current_frame_path)
+    people_count = recognize_frame()
+    post_data(people_count, const.device_type, const.zone_id)
     time.sleep(1)
-    loop_job()
+    detection_job(cameraManager)
 
 
 if __name__ == "__main__":
     app = make_app()
     app.listen(5050)
-    IOLoop.current().run_in_executor(None, loop_job)
+    cameraManager = Camera()
+    IOLoop.current().run_in_executor(None, detection_job, cameraManager)
     IOLoop.current().start()

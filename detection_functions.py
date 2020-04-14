@@ -1,12 +1,9 @@
-from camera_functions import Camera
 import time
 from constants import const
 import cv2
 
 
-def capture_and_recognize():
-    Camera().capture_and_save(const.current_frame_path, 2)
-
+def recognize_frame():
     classNames = {0: 'background', 1: 'person'}
 
     def id_class_name(class_id, classes):
