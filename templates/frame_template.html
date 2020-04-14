@@ -1,0 +1,22 @@
+<html>
+<head>
+
+</head>
+<body>
+    <script type="text/javascript">
+        var newImage = new Image();
+        newImage.src = "http://localhost/image.jpg";
+        function updateImage() {
+            if(newImage.complete) {
+                document.getElementById("frame").src = newImage.src;
+                newImage = new Image();
+                newImage.src = "/frame?time=" + new Date();
+                console.log("updated")
+            }
+            setTimeout(updateImage, 100);
+        }
+        updateImage()
+    </script>
+    <img id="frame" src="/frame" />
+</body>
+</html>
